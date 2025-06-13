@@ -6,121 +6,89 @@
   <title>German Speaking Test</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #6a11cb;
-      --secondary-color: #2575fc;
-      --card-bg: rgba(255, 255, 255, 0.1);
-      --text-color: #f0f0f0;
-      --input-bg: rgba(255, 255, 255, 0.2);
-      --success-color: #28a745;
-      --error-color: #dc3545;
-      --white: #fff;
-    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+    body { 
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      color: var(--text-color);
+      background: linear-gradient(135deg, #74ABE2 0%, #5563DE 100%);
+      color: #333;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       padding: 20px;
-      overflow: hidden;
     }
     .card {
-      background: var(--card-bg);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      max-width: 500px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-width: 480px;
       width: 100%;
-      padding: 40px;
+      padding: 32px;
       text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .card.listening {
-        transform: scale(1.02);
-        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
     }
     h1 {
-      font-size: 2rem;
-      color: var(--white);
+      font-size: 1.8rem;
+      color: #5563DE;
       margin-bottom: 24px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     .input-group {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
     input[type="text"] {
       flex: 1;
-      padding: 14px 18px;
+      padding: 12px 16px;
       font-size: 1rem;
-      border: none;
-      border-radius: 10px;
-      background: var(--input-bg);
-      color: var(--white);
-      transition: background 0.3s;
-      font-family: 'Poppins', sans-serif;
-    }
-    input[type="text"]::placeholder {
-        color: rgba(255, 255, 255, 0.7);
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      transition: border-color 0.3s;
     }
     input[type="text"]:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.3);
+      border-color: #5563DE;
     }
     .btn {
-      padding: 14px 22px;
+      padding: 12px 20px;
       font-size: 1rem;
       font-weight: 600;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
-      color: var(--white);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: background 0.3s, transform 0.2s;
+      background: #5563DE;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(85,99,222,0.4);
     }
     .btn:hover {
-      background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.2) 100%);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      background: #4051b5;
+      transform: translateY(-2px);
     }
     .btn:active {
       transform: translateY(0);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(85,99,222,0.4);
     }
     #feedback {
       margin-top: 24px;
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 1.25rem;
       min-height: 1.5em;
-      transition: color 0.4s ease, transform 0.4s ease;
     }
-    #feedback.correct {
-        color: var(--success-color);
-        transform: scale(1.1);
-        text-shadow: 0 0 10px var(--success-color);
-    }
-    #feedback.wrong {
-        color: var(--error-color);
-        animation: shake 0.5s ease;
-    }
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-    #spoken {
+    #spoken, #diff {
       margin-top: 12px;
       font-size: 1rem;
-      color: rgba(255, 255, 255, 0.8);
+      color: #666;
       min-height: 1.2em;
+      word-wrap: break-word;
+    }
+    #diff span {
+      display: inline-block;
+    }
+    #diff .correct {
+      color: #4CAF50;
+    }
+    #diff .wrong {
+      color: #E91E63;
+      text-decoration: underline;
     }
     .controls {
       display: flex;
@@ -135,83 +103,69 @@
   <div class="card">
     <h1>🎤 Deutsch Sprech-Test</h1>
     <div class="input-group">
-      <input type="text" id="targetPhrase" placeholder="Phrase eingeben (z.B. Guten Morgen)">
+      <input type="text" id="targetPhrase" placeholder="Phrase eingeben (z.B. ich brauche ein Buch)">
       <button class="btn" id="speakBtn">🔊</button>
     </div>
     <div class="controls">
       <button class="btn" id="startBtn">⬤ Aufnahme starten</button>
       <button class="btn" id="stopBtn">■ Stopp</button>
     </div>
-    <div id="feedback">Bitte geben Sie eine Phrase ein und drücken Sie Start.</div>
+    <div id="feedback">Bitte Phrase eingeben und Aufnahme starten.</div>
     <div id="spoken"></div>
+    <div id="diff"></div>
   </div>
 
   <script>
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const card = document.querySelector('.card');
-    const feedbackEl = document.getElementById('feedback');
-    const spokenEl = document.getElementById('spoken');
-    const targetPhraseEl = document.getElementById('targetPhrase');
-
-    if (!SpeechRecognition) {
-      feedbackEl.textContent = "Bitte verwenden Sie Chrome oder Edge.";
-      alert("Bitte verwenden Sie Chrome oder Edge für diese Anwendung.");
-    }
-
+    if (!SpeechRecognition) alert("Bitte Chrome oder Edge verwenden.");
     const recognition = new SpeechRecognition();
     recognition.lang = 'de-DE';
     recognition.continuous = false;
     recognition.interimResults = false;
 
+    // Speak button
     document.getElementById('speakBtn').onclick = () => {
-      const phrase = targetPhraseEl.value.trim();
+      const phrase = document.getElementById('targetPhrase').value.trim();
       if (!phrase) return;
-      const utter = new SpeechSynthesisUtterance(phrase);
-      utter.lang = 'de-DE';
-      speechSynthesis.speak(utter);
+      const u = new SpeechSynthesisUtterance(phrase);
+      u.lang = 'de-DE'; speechSynthesis.speak(u);
     };
 
+    // Start listening
     document.getElementById('startBtn').onclick = () => {
-      const target = targetPhraseEl.value.trim().toLowerCase();
-      if (!target) {
-        alert("Bitte geben Sie zuerst eine Phrase ein!");
-        return;
-      }
+      const tgt = document.getElementById('targetPhrase').value.trim().toLowerCase();
+      if (!tgt) return alert("Bitte zuerst eingeben!");
       recognition.start();
+      document.getElementById('feedback').textContent = "Höre...";
+      document.getElementById('spoken').textContent = '';
+      document.getElementById('diff').innerHTML = '';
     };
 
-    document.getElementById('stopBtn').onclick = () => {
-      recognition.stop();
-    };
+    document.getElementById('stopBtn').onclick = () => recognition.stop();
 
-    recognition.onstart = () => {
-        card.classList.add('listening');
-        feedbackEl.textContent = "Höre...";
-        feedbackEl.className = '';
-        spokenEl.textContent = '';
-    };
-
-    recognition.onend = () => {
-        card.classList.remove('listening');
-    };
-
-    recognition.onresult = (e) => {
-      const spoken = e.results[0][0].transcript.trim().toLowerCase();
-      spokenEl.textContent = `Sie sagten: "${spoken}"`;
-      const target = targetPhraseEl.value.trim().toLowerCase();
-      
-      if (spoken === target) {
-          feedbackEl.textContent = '✅ Perfekt!';
-          feedbackEl.className = 'correct';
-      } else {
-          feedbackEl.textContent = '❌ Fast! Versuchen Sie es erneut!';
-          feedbackEl.className = 'wrong';
+    // Compare and highlight differences
+    function highlightDiff(target, spoken) {
+      const maxLen = Math.max(target.length, spoken.length);
+      let html = '';
+      for (let i = 0; i < maxLen; i++) {
+        const t = target[i] || '';
+        const s = spoken[i] || '';
+        if (s === t) html += `<span class="correct">${s}</span>`;
+        else html += `<span class="wrong" title="Erwartet '${t}'">${s || '_'}</span>`;
       }
+      return html;
+    }
+
+    recognition.onresult = e => {
+      const spoken = e.results[0][0].transcript.trim().toLowerCase();
+      const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
+      document.getElementById('spoken').textContent = `Sie sagten: ${spoken}`;
+      document.getElementById('feedback').textContent = spoken === target ? '✅ Genau!' : '❌ Nicht korrekt!';
+      document.getElementById('diff').innerHTML = highlightDiff(target, spoken);
     };
 
-    recognition.onerror = (e) => {
-      feedbackEl.textContent = `Fehler: ${e.error}`;
-      feedbackEl.className = 'wrong';
+    recognition.onerror = e => {
+      document.getElementById('feedback').textContent = `Fehler: ${e.error}`;
     };
   </script>
 </body>
