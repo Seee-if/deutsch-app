@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live German Speech Test</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #f0f0f0;
+    }
+    h1 { text-align: center; }
+    button {
+      padding: 15px 25px;
+      font-size: 18px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #0078d4;
+      color: #fff;
+    }
+    #spokenText {
+      font-size: 20px;
+      margin-top: 20px;
+      padding: 10px;
+      width: 90%;
+      max-width: 500px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 Live German Speech Test</h1>
+  <button id="startBtn">Start Listening</button>
+  <button id="stopBtn">Stop Listening</button>
+  <div id="spokenText">Say something...</div>
+
+  <script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support Speech Recognition. Please use Chrome or Edge.");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'de-DE'; // German
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const spokenTextDiv = document.getElementById('spokenText');
+
+    startBtn.onclick = () => {
+      recognition.start();
+      spokenTextDiv.textContent = "Listening...";
+    };
+
+    stopBtn.onclick = () => {
+      recognition.stop();
+      spokenTextDiv.textContent += "\n\nStopped.";
+    };
+
+    recognition.onresult = (event) => {
+      let text = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        text += event.results[i][0].transcript + ' ';
+      }
+      spokenTextDiv.textContent = text.trim();
+    };
+
+    recognition.onerror = (event) => {
+      spokenTextDiv.textContent = "Error: " + event.error;
+    };
+
+    recognition.onend = () => {
+      // Optionally auto-restart
+      // recognition.start();
+    };
+  </script>
+</body>
+</html>
