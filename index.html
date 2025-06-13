@@ -15,18 +15,22 @@
       background: #f0f0f0;
     }
     h1 { color: #0078d4; }
+    .input-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0;
+    }
     input {
       padding: 10px;
       font-size: 18px;
       width: 300px;
-      margin: 10px 0;
     }
     button {
-      padding: 12px 24px;
-      margin: 5px;
-      font-size: 18px;
+      padding: 10px 16px;
+      font-size: 16px;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       background: #0078d4;
       color: white;
       cursor: pointer;
@@ -44,15 +48,20 @@
 </head>
 <body>
   <h1>🎤 German Speaking Test</h1>
-  <input type="text" id="targetPhrase" placeholder="Type the phrase to say (e.g. Guten Morgen)">
-  <button id="speakBtn">Speak Phrase</button>
+
+  <div class="input-container">
+    <input type="text" id="targetPhrase" placeholder="Type the phrase to say (e.g. Guten Morgen)">
+    <button id="speakBtn">🔊 Speak</button>
+  </div>
+
   <button id="startBtn">Start Speaking</button>
   <button id="stopBtn">Stop</button>
+
   <div id="feedback">Waiting...</div>
   <div id="spoken"></div>
 
   <script>
-    // Set up SpeechRecognition
+    // SpeechRecognition setup
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("This app works best in Chrome or Edge!");
@@ -63,7 +72,7 @@
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    // Speak the typed phrase
+    // Speak typed phrase
     document.getElementById('speakBtn').onclick = () => {
       const phrase = document.getElementById('targetPhrase').value.trim();
       if (!phrase) {
@@ -91,11 +100,10 @@
       recognition.stop();
     };
 
-    // Handle speech result
+    // Handle result
     recognition.onresult = (event) => {
       const spoken = event.results[0][0].transcript.trim().toLowerCase();
       document.getElementById('spoken').textContent = `You said: ${spoken}`;
-
       const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
 
       if (spoken === target) {
