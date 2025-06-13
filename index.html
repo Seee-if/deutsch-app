@@ -4,117 +4,148 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>German Speaking Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: sans-serif;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ABE2 0%, #5563DE 100%);
+      color: #333;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
+      min-height: 100vh;
       padding: 20px;
-      background: #f0f0f0;
     }
-    h1 { color: #0078d4; }
-    .input-container {
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-width: 480px;
+      width: 100%;
+      padding: 32px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #5563DE;
+      margin-bottom: 24px;
+    }
+    .input-group {
       display: flex;
-      align-items: center;
       gap: 8px;
-      margin: 10px 0;
+      margin-bottom: 16px;
     }
-    input {
-      padding: 10px;
-      font-size: 18px;
-      width: 300px;
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      transition: border-color 0.3s;
     }
-    button {
-      padding: 10px 16px;
-      font-size: 16px;
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #5563DE;
+    }
+    .btn {
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 600;
       border: none;
-      border-radius: 6px;
-      background: #0078d4;
-      color: white;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      background: #5563DE;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(85,99,222,0.4);
+    }
+    .btn:hover {
+      background: #4051b5;
+      transform: translateY(-2px);
+    }
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(85,99,222,0.4);
     }
     #feedback {
-      margin-top: 20px;
-      font-size: 22px;
+      margin-top: 24px;
+      font-size: 1.25rem;
+      min-height: 1.5em;
     }
     #spoken {
-      margin-top: 10px;
-      font-size: 18px;
-      color: #555;
+      margin-top: 12px;
+      font-size: 1rem;
+      color: #666;
+      min-height: 1.2em;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
     }
   </style>
 </head>
 <body>
-  <h1>🎤 German Speaking Test</h1>
-
-  <div class="input-container">
-    <input type="text" id="targetPhrase" placeholder="Type the phrase to say (e.g. Guten Morgen)">
-    <button id="speakBtn">🔊 Speak</button>
+  <div class="card">
+    <h1>🎤 Deutsch Sprech-Test</h1>
+    <div class="input-group">
+      <input type="text" id="targetPhrase" placeholder="Phrase eingeben (z.B. Guten Morgen)">
+      <button class="btn" id="speakBtn">🔊</button>
+    </div>
+    <div class="controls">
+      <button class="btn" id="startBtn">⬤ Aufnahme starten</button>
+      <button class="btn" id="stopBtn">■ Stopp</button>
+    </div>
+    <div id="feedback">Bitte geben Sie eine Phrase ein und drücken Sie Start.</div>
+    <div id="spoken"></div>
   </div>
 
-  <button id="startBtn">Start Speaking</button>
-  <button id="stopBtn">Stop</button>
-
-  <div id="feedback">Waiting...</div>
-  <div id="spoken"></div>
-
   <script>
-    // SpeechRecognition setup
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("This app works best in Chrome or Edge!");
+      alert("Bitte verwenden Sie Chrome oder Edge für diese Anwendung.");
     }
-
     const recognition = new SpeechRecognition();
     recognition.lang = 'de-DE';
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    // Speak typed phrase
     document.getElementById('speakBtn').onclick = () => {
       const phrase = document.getElementById('targetPhrase').value.trim();
-      if (!phrase) {
-        alert("Please type a phrase first!");
-        return;
-      }
-      const utterance = new SpeechSynthesisUtterance(phrase);
-      utterance.lang = 'de-DE';
-      speechSynthesis.speak(utterance);
+      if (!phrase) return;
+      const utter = new SpeechSynthesisUtterance(phrase);
+      utter.lang = 'de-DE';
+      speechSynthesis.speak(utter);
     };
 
-    // Start listening
     document.getElementById('startBtn').onclick = () => {
       const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
       if (!target) {
-        alert("Please type a phrase first!");
+        alert("Bitte geben Sie zuerst eine Phrase ein!");
         return;
       }
       recognition.start();
-      document.getElementById('feedback').textContent = "Listening...";
+      document.getElementById('feedback').textContent = "Höre...";
+      document.getElementById('spoken').textContent = '';
     };
 
-    // Stop listening
     document.getElementById('stopBtn').onclick = () => {
       recognition.stop();
     };
 
-    // Handle result
-    recognition.onresult = (event) => {
-      const spoken = event.results[0][0].transcript.trim().toLowerCase();
-      document.getElementById('spoken').textContent = `You said: ${spoken}`;
+    recognition.onresult = (e) => {
+      const spoken = e.results[0][0].transcript.trim().toLowerCase();
+      document.getElementById('spoken').textContent = `Sie sagten: ${spoken}`;
       const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
-
-      if (spoken === target) {
-        document.getElementById('feedback').textContent = "✅ Correct!";
-      } else {
-        document.getElementById('feedback').textContent = "❌ Try again!";
-      }
+      document.getElementById('feedback').textContent = 
+        spoken === target ? '✅ Richtig!' : '❌ Versuchen Sie es erneut!';
     };
 
-    recognition.onerror = (event) => {
-      document.getElementById('feedback').textContent = `Error: ${event.error}`;
+    recognition.onerror = (e) => {
+      document.getElementById('feedback').textContent = `Fehler: ${e.error}`;
     };
   </script>
 </body>
