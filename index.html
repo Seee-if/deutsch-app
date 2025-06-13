@@ -45,12 +45,14 @@
 <body>
   <h1>🎤 German Speaking Test</h1>
   <input type="text" id="targetPhrase" placeholder="Type the phrase to say (e.g. Guten Morgen)">
+  <button id="speakBtn">Speak Phrase</button>
   <button id="startBtn">Start Speaking</button>
   <button id="stopBtn">Stop</button>
   <div id="feedback">Waiting...</div>
   <div id="spoken"></div>
 
   <script>
+    // Set up SpeechRecognition
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("This app works best in Chrome or Edge!");
@@ -58,9 +60,22 @@
 
     const recognition = new SpeechRecognition();
     recognition.lang = 'de-DE';
-    recognition.continuous = false;  // Stop after each result
+    recognition.continuous = false;
     recognition.interimResults = false;
 
+    // Speak the typed phrase
+    document.getElementById('speakBtn').onclick = () => {
+      const phrase = document.getElementById('targetPhrase').value.trim();
+      if (!phrase) {
+        alert("Please type a phrase first!");
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(phrase);
+      utterance.lang = 'de-DE';
+      speechSynthesis.speak(utterance);
+    };
+
+    // Start listening
     document.getElementById('startBtn').onclick = () => {
       const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
       if (!target) {
@@ -71,10 +86,12 @@
       document.getElementById('feedback').textContent = "Listening...";
     };
 
+    // Stop listening
     document.getElementById('stopBtn').onclick = () => {
       recognition.stop();
     };
 
+    // Handle speech result
     recognition.onresult = (event) => {
       const spoken = event.results[0][0].transcript.trim().toLowerCase();
       document.getElementById('spoken').textContent = `You said: ${spoken}`;
