@@ -1,90 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live German Speech Test</title>
+  <title>German Speaking Test</title>
   <style>
     body {
       font-family: sans-serif;
-      margin: 0;
-      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      padding: 20px;
       background: #f0f0f0;
     }
-    h1 { text-align: center; }
-    button {
-      padding: 15px 25px;
+    h1 { color: #0078d4; }
+    input {
+      padding: 10px;
       font-size: 18px;
-      margin: 10px;
+      width: 300px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 12px 24px;
+      margin: 5px;
+      font-size: 18px;
       border: none;
       border-radius: 8px;
       background: #0078d4;
-      color: #fff;
+      color: white;
+      cursor: pointer;
     }
-    #spokenText {
-      font-size: 20px;
+    #feedback {
       margin-top: 20px;
-      padding: 10px;
-      width: 90%;
-      max-width: 500px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      word-wrap: break-word;
+      font-size: 22px;
+    }
+    #spoken {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>🎤 Live German Speech Test</h1>
-  <button id="startBtn">Start Listening</button>
-  <button id="stopBtn">Stop Listening</button>
-  <div id="spokenText">Say something...</div>
+  <h1>🎤 German Speaking Test</h1>
+  <input type="text" id="targetPhrase" placeholder="Type the phrase to say (e.g. Guten Morgen)">
+  <button id="startBtn">Start Speaking</button>
+  <button id="stopBtn">Stop</button>
+  <div id="feedback">Waiting...</div>
+  <div id="spoken"></div>
 
   <script>
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Your browser does not support Speech Recognition. Please use Chrome or Edge.");
+      alert("This app works best in Chrome or Edge!");
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'de-DE'; // German
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.lang = 'de-DE';
+    recognition.continuous = false;  // Stop after each result
+    recognition.interimResults = false;
 
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const spokenTextDiv = document.getElementById('spokenText');
-
-    startBtn.onclick = () => {
+    document.getElementById('startBtn').onclick = () => {
+      const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
+      if (!target) {
+        alert("Please type a phrase first!");
+        return;
+      }
       recognition.start();
-      spokenTextDiv.textContent = "Listening...";
+      document.getElementById('feedback').textContent = "Listening...";
     };
 
-    stopBtn.onclick = () => {
+    document.getElementById('stopBtn').onclick = () => {
       recognition.stop();
-      spokenTextDiv.textContent += "\n\nStopped.";
     };
 
     recognition.onresult = (event) => {
-      let text = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        text += event.results[i][0].transcript + ' ';
+      const spoken = event.results[0][0].transcript.trim().toLowerCase();
+      document.getElementById('spoken').textContent = `You said: ${spoken}`;
+
+      const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
+
+      if (spoken === target) {
+        document.getElementById('feedback').textContent = "✅ Correct!";
+      } else {
+        document.getElementById('feedback').textContent = "❌ Try again!";
       }
-      spokenTextDiv.textContent = text.trim();
     };
 
     recognition.onerror = (event) => {
-      spokenTextDiv.textContent = "Error: " + event.error;
-    };
-
-    recognition.onend = () => {
-      // Optionally auto-restart
-      // recognition.start();
+      document.getElementById('feedback').textContent = `Error: ${event.error}`;
     };
   </script>
 </body>
