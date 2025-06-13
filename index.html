@@ -21,7 +21,7 @@
       background: #fff;
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-width: 480px;
+      max-width: 500px;
       width: 100%;
       padding: 32px;
       text-align: center;
@@ -116,6 +116,28 @@
   </div>
 
   <script>
+    // Levenshtein distance for strict matching
+    function levenshtein(a, b) {
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+      }
+      for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+      }
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b[i - 1] === a[j - 1]) matrix[i][j] = matrix[i - 1][j - 1];
+          else matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) alert("Bitte Chrome oder Edge verwenden.");
     const recognition = new SpeechRecognition();
@@ -143,7 +165,7 @@
 
     document.getElementById('stopBtn').onclick = () => recognition.stop();
 
-    // Compare and highlight differences
+    // Highlight differences char-by-char
     function highlightDiff(target, spoken) {
       const maxLen = Math.max(target.length, spoken.length);
       let html = '';
@@ -157,10 +179,16 @@
     }
 
     recognition.onresult = e => {
-      const spoken = e.results[0][0].transcript.trim().toLowerCase();
-      const target = document.getElementById('targetPhrase').value.trim().toLowerCase();
-      document.getElementById('spoken').textContent = `Sie sagten: ${spoken}`;
-      document.getElementById('feedback').textContent = spoken === target ? '✅ Genau!' : '❌ Nicht korrekt!';
+      const spokenRaw = e.results[0][0].transcript.trim();
+      const spoken = spokenRaw.toLowerCase();
+      const targetRaw = document.getElementById('targetPhrase').value.trim();
+      const target = targetRaw.toLowerCase();
+
+      document.getElementById('spoken').textContent = `Sie sagten: ${spokenRaw}`;
+
+      const dist = levenshtein(target, spoken);
+      const feedback = dist === 0 ? '✅ Genau!' : `❌ Fehler: ${dist} Abweichung(en)`;
+      document.getElementById('feedback').textContent = feedback;
       document.getElementById('diff').innerHTML = highlightDiff(target, spoken);
     };
 
