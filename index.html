@@ -1,102 +1,47 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>German Speaking Test</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
+    body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #74ABE2 0%, #5563DE 100%);
-      color: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
     }
     .card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      max-width: 500px;
-      width: 100%;
-      padding: 32px;
-      text-align: center;
+      background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-width: 500px; width: 100%; padding: 32px; text-align: center;
     }
-    h1 {
-      font-size: 1.8rem;
-      color: #5563DE;
-      margin-bottom: 24px;
-    }
-    .input-group {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+    h1 { font-size: 1.8rem; color: #5563DE; margin-bottom: 24px; }
+    .input-group { display: flex; gap: 8px; margin-bottom: 16px; }
     input[type="text"] {
-      flex: 1;
-      padding: 12px 16px;
-      font-size: 1rem;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      transition: border-color 0.3s;
+      flex: 1; padding: 12px 16px; font-size: 1rem;
+      border: 2px solid #ddd; border-radius: 8px; transition: border-color 0.3s;
     }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: #5563DE;
-    }
+    input[type="text"]:focus { outline: none; border-color: #5563DE; }
     .btn {
-      padding: 12px 20px;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      background: #5563DE;
-      color: #fff;
+      padding: 12px 20px; font-size: 1rem; font-weight: 600;
+      border: none; border-radius: 8px; cursor: pointer;
+      background: #5563DE; color: #fff;
       box-shadow: 0 4px 16px rgba(85,99,222,0.4);
+      transition: background 0.3s, transform 0.2s;
     }
-    .btn:hover {
-      background: #4051b5;
-      transform: translateY(-2px);
-    }
-    .btn:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(85,99,222,0.4);
-    }
-    #feedback {
-      margin-top: 24px;
-      font-size: 1.25rem;
-      min-height: 1.5em;
-    }
+    .btn:hover { background: #4051b5; transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(85,99,222,0.4); }
+    #feedback { margin-top: 24px; font-size: 1.25rem; min-height: 1.5em; }
     #spoken, #diff {
-      margin-top: 12px;
-      font-size: 1rem;
-      color: #666;
-      min-height: 1.2em;
-      word-wrap: break-word;
+      margin-top: 12px; font-size: 1rem; color: #666;
+      min-height: 1.2em; word-wrap: break-word;
     }
-    #diff span {
-      display: inline-block;
-    }
-    #diff .correct {
-      color: #4CAF50;
-    }
-    #diff .wrong {
-      color: #E91E63;
-      text-decoration: underline;
-    }
-    .controls {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
+    #diff span { display: inline-block; }
+    #diff .correct { color: #4CAF50; }
+    #diff .wrong { color: #E91E63; text-decoration: underline; }
+    .controls { display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
@@ -114,71 +59,52 @@
     <div id="spoken"></div>
     <div id="diff"></div>
   </div>
-
   <script>
-    // Levenshtein distance for strict matching
-    function levenshtein(a, b) {
-      const matrix = [];
-      for (let i = 0; i <= b.length; i++) {
-        matrix[i] = [i];
-      }
-      for (let j = 0; j <= a.length; j++) {
-        matrix[0][j] = j;
-      }
-      for (let i = 1; i <= b.length; i++) {
-        for (let j = 1; j <= a.length; j++) {
-          if (b[i - 1] === a[j - 1]) matrix[i][j] = matrix[i - 1][j - 1];
-          else matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
-          );
-        }
-      }
-      return matrix[b.length][a.length];
-    }
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) alert("Bitte Chrome oder Edge verwenden.");
+    if (!SpeechRecognition) alert('Bitte Chrome oder Edge verwenden.');
     const recognition = new SpeechRecognition();
-    recognition.lang = 'de-DE';
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.lang = 'de-DE'; recognition.continuous = false; recognition.interimResults = false;
 
-    // Speak button
-    document.getElementById('speakBtn').onclick = () => {
+    // Speak phrase
+    document.getElementById('speakBtn').addEventListener('click', () => {
       const phrase = document.getElementById('targetPhrase').value.trim();
       if (!phrase) return;
-      const u = new SpeechSynthesisUtterance(phrase);
-      u.lang = 'de-DE'; speechSynthesis.speak(u);
-    };
+      const utter = new SpeechSynthesisUtterance(phrase);
+      utter.lang = 'de-DE'; speechSynthesis.speak(utter);
+    });
 
     // Start listening
-    document.getElementById('startBtn').onclick = () => {
-      const tgt = document.getElementById('targetPhrase').value.trim().toLowerCase();
-      if (!tgt) return alert("Bitte zuerst eingeben!");
+    document.getElementById('startBtn').addEventListener('click', () => {
+      const target = document.getElementById('targetPhrase').value.trim();
+      if (!target) return alert('Bitte zuerst eine Phrase eingeben!');
       recognition.start();
-      document.getElementById('feedback').textContent = "Höre...";
+      document.getElementById('feedback').textContent = 'Höre...';
       document.getElementById('spoken').textContent = '';
       document.getElementById('diff').innerHTML = '';
-    };
+    });
 
-    document.getElementById('stopBtn').onclick = () => recognition.stop();
+    // Stop listening
+    document.getElementById('stopBtn').addEventListener('click', () => recognition.stop());
 
-    // Highlight differences char-by-char
-    function highlightDiff(target, spoken) {
-      const maxLen = Math.max(target.length, spoken.length);
+    // Highlight per-letter match
+    function highlightSpoken(target, spoken) {
       let html = '';
-      for (let i = 0; i < maxLen; i++) {
+      // Highlight each spoken character
+      for (let i = 0; i < spoken.length; i++) {
+        const s = spoken[i];
         const t = target[i] || '';
-        const s = spoken[i] || '';
         if (s === t) html += `<span class="correct">${s}</span>`;
-        else html += `<span class="wrong" title="Erwartet '${t}'">${s || '_'}</span>`;
+        else html += `<span class="wrong" title="Erwartet: '${t}'">${s}</span>`;
+      }
+      // If target has extra letters not spoken, show placeholders
+      for (let i = spoken.length; i < target.length; i++) {
+        const t = target[i];
+        html += `<span class="wrong" title="Erwartet: '${t}'">_</span>`;
       }
       return html;
     }
 
-    recognition.onresult = e => {
+    recognition.onresult = (e) => {
       const spokenRaw = e.results[0][0].transcript.trim();
       const spoken = spokenRaw.toLowerCase();
       const targetRaw = document.getElementById('targetPhrase').value.trim();
@@ -186,13 +112,20 @@
 
       document.getElementById('spoken').textContent = `Sie sagten: ${spokenRaw}`;
 
-      const dist = levenshtein(target, spoken);
-      const feedback = dist === 0 ? '✅ Genau!' : `❌ Fehler: ${dist} Abweichung(en)`;
-      document.getElementById('feedback').textContent = feedback;
-      document.getElementById('diff').innerHTML = highlightDiff(target, spoken);
+      // Strict letter-by-letter check
+      if (spoken.length !== target.length) {
+        document.getElementById('feedback').textContent = '❌ Nicht korrekt! (Länge stimmt nicht)';
+        document.getElementById('diff').innerHTML = highlightSpoken(target, spoken);
+      } else if (spoken === target) {
+        document.getElementById('feedback').textContent = '✅ Genau!';
+        document.getElementById('diff').innerHTML = highlightSpoken(target, spoken);
+      } else {
+        document.getElementById('feedback').textContent = '❌ Nicht korrekt!';
+        document.getElementById('diff').innerHTML = highlightSpoken(target, spoken);
+      }
     };
 
-    recognition.onerror = e => {
+    recognition.onerror = (e) => {
       document.getElementById('feedback').textContent = `Fehler: ${e.error}`;
     };
   </script>
